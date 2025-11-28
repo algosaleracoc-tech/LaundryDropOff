@@ -1,0 +1,138 @@
+# ClearCheck Lite: Scholar Duty Hour Monitoring System
+# Fully compatible with online Python compilers
+
+from datetime import datetime
+
+attendance_records = []
+
+def header(title):
+    print("\n" + "="*50)
+    print(f"{title.center(50)}")
+    print("="*50)
+
+def main_menu():
+    while True:
+        header("CLEARCHECK LITE - MAIN MENU")
+        print("1. Scholar")
+        print("2. Administrator")
+        print("3. Exit")
+        choice = input("\nEnter choice: ")
+        if choice == '1':
+            scholar_menu()
+        elif choice == '2':
+            admin_menu()
+        elif choice == '3':
+            print("\nThank you for using ClearCheck Lite!")
+            break
+        else:
+            print("\nInvalid choice. Try again.")
+
+# ---------- SCHOLAR FUNCTIONS ----------
+def scholar_menu():
+    while True:
+        header("SCHOLAR MENU")
+        print("1. Time In")
+        print("2. Time Out")
+        print("3. View My Attendance")
+        print("4. Back to Main Menu")
+        choice = input("\nEnter choice: ")
+
+        if choice == '1':
+            time_in()
+        elif choice == '2':
+            time_out()
+        elif choice == '3':
+            view_my_attendance()
+        elif choice == '4':
+            break
+        else:
+            print("\nInvalid choice. Try again.")
+
+def time_in():
+    header("TIME IN")
+    name = input("Enter your name: ").strip()
+    now = datetime.now()
+    record = {'name': name, 'time_in': now, 'time_out': None, 'hours': 0}
+    attendance_records.append(record)
+    print(f"\n✅ {name} logged in at {now.strftime('%Y-%m-%d %H:%M:%S')}")
+
+def time_out():
+    header("TIME OUT")
+    name = input("Enter your name: ").strip()
+    found = False
+    for record in attendance_records:
+        if record['name'].lower() == name.lower() and record['time_out'] is None:
+            record['time_out'] = datetime.now()
+            record['hours'] = round((record['time_out'] - record['time_in']).seconds / 3600, 2)
+            print(f"\n✅ {name} logged out successfully!")
+            print(f"🕒 Total hours worked: {record['hours']} hour(s)")
+            found = True
+            break
+    if not found:
+        print("\n⚠️ No active time-in record found.")
+
+def view_my_attendance():
+    header("MY ATTENDANCE RECORDS")
+    name = input("Enter your name: ").strip()
+    found = False
+    for record in attendance_records:
+        if record['name'].lower() == name.lower():
+            found = True
+            print(f"\nName: {record['name']}")
+            print(f"Time In: {record['time_in'].strftime('%Y-%m-%d %H:%M:%S')}")
+            if record['time_out']:
+                print(f"Time Out: {record['time_out'].strftime('%Y-%m-%d %H:%M:%S')}")
+                print(f"Total Hours: {record['hours']}")
+            else:
+                print("Time Out: Not yet recorded")
+    if not found:
+        print("\n⚠️ No records found for this scholar.")
+
+# ---------- ADMIN FUNCTIONS ----------
+def admin_menu():
+    while True:
+        header("ADMINISTRATOR MENU")
+        print("1. View All Attendance Logs")
+        print("2. Delete Record")
+        print("3. Back to Main Menu")
+        choice = input("\nEnter choice: ")
+
+        if choice == '1':
+            view_all_logs()
+        elif choice == '2':
+            delete_record()
+        elif choice == '3':
+            break
+        else:
+            print("\nInvalid choice. Try again.")
+
+def view_all_logs():
+    header("ALL ATTENDANCE LOGS")
+    if not attendance_records:
+        print("\n⚠️ No attendance records found.")
+    else:
+        for i, record in enumerate(attendance_records, start=1):
+            print(f"\nRecord #{i}")
+            print(f"Name: {record['name']}")
+            print(f"Time In: {record['time_in'].strftime('%Y-%m-%d %H:%M:%S')}")
+            if record['time_out']:
+                print(f"Time Out: {record['time_out'].strftime('%Y-%m-%d %H:%M:%S')}")
+                print(f"Total Hours: {record['hours']}")
+            else:
+                print("Time Out: Not yet recorded")
+
+def delete_record():
+    header("DELETE RECORD")
+    name = input("Enter scholar name to delete record: ").strip()
+    global attendance_records
+    before = len(attendance_records)
+    attendance_records = [r for r in attendance_records if r['name'].lower() != name.lower()]
+    after = len(attendance_records)
+    if before == after:
+        print("\n⚠️ No matching record found.")
+    else:
+        print(f"\n🗑️ All records for {name} deleted successfully.")
+
+# ---------- START PROGRAM ----------
+if __name__ == "__main__":
+    main_menu()
